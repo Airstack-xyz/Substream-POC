@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package token_tracker;
+
+enum AirTokenStandard{
+    UNKNOWN = 0;
+    ERC20 = 1;
+    ERC721 = 2;
+    ERC1155 = 3;
+}
+
+message AirToken{
+    bytes id = 1;
+    string token_address = 2;
+    string name = 3;
+    string symbol = 4;
+    uint64 totalSupply = 5;
+    uint64 decimals = 6;
+    repeated AirTokenStandard standard = 7;
+    repeated AirBlock lastActivityBlock = 8;
+}
+
+message AirNFT{
+    bytes id = 1;
+    AirToken token = 2;
+    uint32 tokenId = 3;
+    string tokenURI = 4;
+    uint64 amount = 5;
+    AirBlock lastActivityBlock = 6; 
+}
+
+message AirBlock{
+    bytes hash = 1;
+    uint64 number = 2;
+    string timestamp = 3;
+}
+
+message AirTransfers{
+    repeated AirTransfer airTransfers = 1;
+}
+
+message AirTransfer{
+    uint64 amount = 1;
+    string tokenAddress = 2;
+    bytes hash = 3;
+    string from = 4;
+    string to = 5;
+}
+
+message AirAccount{
+    bytes id = 1;
+    bytes address = 2;
+    repeated AirTokenBalance balances = 3;
+    repeated AirTransfer outgoingTransfers = 4;
+    repeated AirTransfer incomingTransfers = 5;
+}
+
+message AirTokenBalance{
+    bytes id = 1;
+    uint64 amount = 2;
+    AirAccount account = 3;
+    AirBlock lastActivityBlock = 4;
+    AirToken token = 5;
+    AirNFT nft = 6;
+}
