@@ -25,3 +25,10 @@ modules:
       - source: sf.ethereum.type.v2.Block
     output:
       type: proto:token_tracker.AirTransfers
+
+  - name: store_transfers
+    kind: store
+    updatePolicy: set
+    valueType: proto:token_tracker.AirTransfer
+    inputs:
+      - map: map_erc20_transfer

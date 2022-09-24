@@ -1,8 +1,12 @@
 mod abis;
 mod pb;
+mod rpc;
+
+use num_bigint::BigInt;
 
 use pb::token_tracker::{AirTransfers, AirTransfer, AirBlock, AirAccount};
-use substreams::{log, store, Hex};
+use substreams::store;
+use substreams::{log, Hex, proto};
 use substreams::errors::Error;
 use substreams_ethereum::{pb::eth::v2 as eth, Event as EventTrait};
 
@@ -13,37 +17,34 @@ fn map_erc20_transfer(blk: eth::Block) -> Result<AirTransfers, Error> {
         if let Some(event) = abis::ERC20::events::Transfer::match_and_decode(log){
             log::info!("transfer event: {}", Hex(&event.to));
             log::info!("token: {}", Hex(log.log.clone().address));
+            // let wallet_balance_data = hex::decode("18160ddd").unwrap();
+            // log::info!()
             // log::info!(log.to_string());
 
-            // let mut blockRecord: AirBlock = AirBlock{
-            //     hash: blk.hash,
-            //     number: blk.number,
-            //     timestamp: blk
-            //     .header
-            //     .as_ref()
-            //     .unwrap()
-            //     .timestamp
-            //     .as_ref()
-            //     .unwrap()
-            //     .seconds
-            //     .to_string(),
-            // };
+            let mut blockRecord: AirBlock = AirBlock{
+                hash: blk.clone().hash,
+                number: blk.clone().number,
+                timestamp: blk.clone()
+                .header
+                .as_ref()
+                .unwrap()
+                .timestamp
+                .as_ref()
+                .unwrap()
+                .seconds
+                .to_string(),
+            };
 
-            // let fromAddress = match std::str::from_utf8(&event.from) {
-            //     Ok(s) => s,
-            //     Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
-            // };
-            // let toAddress = match std::str::from_utf8(&event.to) {
-            //     Ok(s) => s,
-            //     Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
-            // };
-    
+            let sender_balance: BigInt = rpc::get_wallet_balance(&Hex(&event.from).to_string());
+            log::info!("Sender_balance: {}", sender_balance);
+
             let mut air_transfer: AirTransfer = AirTransfer{
                 amount: event.value.low_u64(),
                 token_address: Hex(log.log.clone().address).to_string(),
                 hash: log.receipt.transaction.hash.clone(),
                 from: Hex(event.from).to_string(),
                 to: Hex(event.to).to_string(),
+                log_ordinal: log.ordinal(),
                 ..Default::default()
             };
     
@@ -51,4 +52,19 @@ fn map_erc20_transfer(blk: eth::Block) -> Result<AirTransfers, Error> {
         }
     }
     Ok(AirTransfers{ air_transfers })
+}
+
+#[substreams::handlers::store]
+fn store_transfers(transfers: AirTransfers, output: store::StoreSet){
+    for transfer in transfers.air_transfers{
+        output.set(
+            transfer.log_ordinal,
+            generate_key(&transfer.hash),
+            &proto::encode(&transfer).unwrap(),
+        );
+    }    
+}
+
+fn generate_key(holder: &Vec<u8>) -> String{
+    return format!("{}", Hex(holder));
 }
