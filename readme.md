@@ -11,10 +11,31 @@ Once you have setup the SUBSTREAMS_API_TOKEN, you are good to run the substream.
 ## Running the substreams
 Just move to the root directory of your substream folder and run this command
 
-`
+```
 substreams run -e api-dev.streamingfast.io:443 \
    substreams.yaml \
    map_erc20_transfer,store_transfers \
    --start-block 12369621 \
    --stop-block 20000000
-`
+```
+
+# Steps to run the consumer
+
+## Move to the consumer directory of the project and create the env folder
+Install what is required to build protobufs:
+
+```bash
+python3 -m venv env
+source env/bin/activate
+pip3 install grpcio-tools protobuf==3.20.1
+# important note, 3.20.1 works newer updated protobuf seem to cause issues -> https://github.com/protocolbuffers/protobuf/issues/10571
+```
+
+## Activate the python environment using
+```
+source env/bin/activate
+```
+Before activating the file make sure you set the SUBSTREAMS_API_TOKEN, after that run the python file "main.py" using
+```
+python3 main.py
+```
