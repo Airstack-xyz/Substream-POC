@@ -29,6 +29,15 @@ message AirNFT{
     AirBlock lastActivityBlock = 6; 
 }
 
+message TransferCalls{
+    repeated TransferCall transferCalls =1;
+}
+
+message TransferCall{
+    string receiver = 1;
+    string value = 2;
+}
+
 message AirBlock{
     bytes hash = 1;
     uint64 number = 2;

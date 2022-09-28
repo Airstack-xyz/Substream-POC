@@ -4,8 +4,9 @@ mod rpc;
 
 use num_bigint::BigInt;
 
-use pb::token_tracker::{AirTransfers, AirTransfer, AirBlock, AirAccount};
+use pb::token_tracker::{AirTransfers, AirTransfer, AirBlock, AirAccount, TransferCall, TransferCalls};
 use substreams::store;
+use substreams_ethereum::Function;
 use substreams::{log, Hex, proto};
 use substreams::errors::Error;
 use substreams_ethereum::{pb::eth::v2 as eth, Event as EventTrait};
@@ -63,6 +64,28 @@ fn store_transfers(transfers: AirTransfers, output: store::StoreSet){
             &proto::encode(&transfer).unwrap(),
         );
     }    
+}
+
+#[substreams::handlers::map]
+fn map_erc20_calldata(blk: eth::Block) -> Result<TransferCalls, Error>{
+    let mut transfer_calls = vec![];
+    for trx in blk.transaction_traces{
+        log::info!("transaction address: {}", Hex(trx.hash));
+        if trx.status != 1{
+            continue;
+        }
+        for call in trx.calls{
+            if let Some(transfer) = abis::ERC20::functions::Transfer::match_and_decode(&call){
+                log::info!("transfer data: {:?}", &transfer.value);
+                let mut transferCall: TransferCall = TransferCall{
+                    receiver: Hex(&transfer.to).to_string(),
+                    value: transfer.value.to_string(),
+                };
+                transfer_calls.push(transferCall);
+            }
+        }
+    }
+    Ok(TransferCalls{transfer_calls})
 }
 
 fn generate_key(holder: &Vec<u8>) -> String{
