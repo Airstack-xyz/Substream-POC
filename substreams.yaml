@@ -39,4 +39,4 @@ modules:
     inputs:
       - source: sf.ethereum.type.v2.Block
     output:
-      type: proto:token_tracker.AirTransfers
+      type: proto:token_tracker.TransferCalls

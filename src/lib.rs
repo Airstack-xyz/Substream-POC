@@ -70,18 +70,32 @@ fn store_transfers(transfers: AirTransfers, output: store::StoreSet){
 fn map_erc20_calldata(blk: eth::Block) -> Result<TransferCalls, Error>{
     let mut transfer_calls = vec![];
     for trx in blk.transaction_traces{
-        log::info!("transaction address: {}", Hex(trx.hash));
+        // log::info!("transaction address: {}", Hex(trx.hash));
         if trx.status != 1{
             continue;
         }
         for call in trx.calls{
+            let mut transaction_address= String::new();
             if let Some(transfer) = abis::ERC20::functions::Transfer::match_and_decode(&call){
-                log::info!("transfer data: {:?}", &transfer.value);
+                // log::info!("transfer data: {:?}", &transfer.value);
                 let mut transferCall: TransferCall = TransferCall{
                     receiver: Hex(&transfer.to).to_string(),
                     value: transfer.value.to_string(),
                 };
+                transaction_address = Hex(&trx.hash).to_string();
+                // log::info!("Transaction address: {}", transaction_address);
                 transfer_calls.push(transferCall);
+            }
+            // log::info!("Transaction address outside: {}", transaction_address);
+            if Hex(&trx.hash).to_string() == transaction_address && &call.call_type.to_string() == "1" && &call.parent_index.to_string() == "0"{
+                log::info!("transaction address: {:?}", transaction_address);
+                log::info!("call address: {}", Hex(&call.address).to_string());
+                // log::info!("call logs: {:?}", &call.logs);
+                log::info!("call caller: {}", Hex(&call.caller));
+                // log::info!("call caller: {}", Hex(&call.));
+                log::info!("call parent index: {}", &call.parent_index);
+                // log::info!("call status failed: {}", &call.status_failed);
+                // log::info!("call status failed: {}", &call.sta);
             }
         }
     }
