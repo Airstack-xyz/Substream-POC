@@ -1,9 +1,17 @@
 # Steps to run the substream in terminal
 
-## Download all the dependencies
-Use this doc to download and install all the dependencies required to run this substream - https://substreams.streamingfast.io/developer-guide/installation-requirements
+## Download and install all the dependencies
+### Install the substreams CLI
+Use this doc to install the CLI - https://substreams.streamingfast.io/getting-started/installing-the-cli
+
+Use this doc to download and install all the dependencies required to develop on the substream - https://substreams.streamingfast.io/developer-guide/installation-requirements
 
 ## Setting up the env
+### Generate rust code with protogen
+```
+substreams protogen ./substreams.yaml --exclude-paths="sf/ethereum,sf/substreams,google"
+```
+
 For getting the block data we are using the substream API "api-dev.streaming-fast.io:443" which is using their particular hosted firehose. For accessing the API we need the streaming-fast token which you can get following this doc https://substreams.streamingfast.io/reference-and-specs/authentication
 
 Once you have setup the SUBSTREAMS_API_TOKEN, you are good to run the substream.
