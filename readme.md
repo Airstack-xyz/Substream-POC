@@ -7,14 +7,21 @@ Use this doc to install the CLI - https://substreams.streamingfast.io/getting-st
 Use this doc to download and install all the dependencies required to develop on the substream - https://substreams.streamingfast.io/developer-guide/installation-requirements
 
 ## Setting up the env
+For getting the block data we are using the substream API "api-dev.streaming-fast.io:443" which is using their particular hosted firehose. For accessing the API we need the streaming-fast token which you can get following this doc https://substreams.streamingfast.io/reference-and-specs/authentication
+
+Once you have setup the SUBSTREAMS_API_TOKEN, you are good to run the substream.
+
+## Build the project
 ### Generate rust code with protogen
 ```
 substreams protogen ./substreams.yaml --exclude-paths="sf/ethereum,sf/substreams,google"
 ```
 
-For getting the block data we are using the substream API "api-dev.streaming-fast.io:443" which is using their particular hosted firehose. For accessing the API we need the streaming-fast token which you can get following this doc https://substreams.streamingfast.io/reference-and-specs/authentication
 
-Once you have setup the SUBSTREAMS_API_TOKEN, you are good to run the substream.
+### Use this command to build the project and install the rust dependencies
+```
+cargo build --target wasm32-unknown-unknown --release
+```
 
 ## Running the substreams
 Just move to the root directory of your substream folder and run this command
@@ -43,7 +50,7 @@ pip3 install grpcio-tools protobuf==3.20.1
 ```
 source env/bin/activate
 ```
-Before activating the file make sure you set the SUBSTREAMS_API_TOKEN, after that run the python file "main.py" using
+Before running the consumer make sure you set the SUBSTREAMS_API_TOKEN, after that run the python file "main.py" using
 ```
 python3 main.py
 ```
