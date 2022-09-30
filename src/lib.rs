@@ -2,7 +2,7 @@ mod abis;
 mod pb;
 mod rpc;
 
-use num_bigint::BigInt;
+// use num_bigint::BigInt;
 
 use pb::token_tracker::{AirTransfers, AirTransfer, AirBlock, AirAccount, TransferCall, TransferCalls};
 use substreams::store;
@@ -36,8 +36,8 @@ fn map_erc20_transfer(blk: eth::Block) -> Result<AirTransfers, Error> {
                 .to_string(),
             };
 
-            let sender_balance: BigInt = rpc::get_wallet_balance(&Hex(&event.from).to_string());
-            log::info!("Sender_balance: {}", sender_balance);
+            // let sender_balance: BigInt = rpc::get_wallet_balance(&Hex(&event.from).to_string());
+            // log::info!("Sender_balance: {}", sender_balance);
 
             let mut air_transfer: AirTransfer = AirTransfer{
                 amount: event.value.low_u64(),
