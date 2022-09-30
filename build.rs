@@ -5,6 +5,8 @@ fn main() -> Result<(), anyhow::Error> {
     Abigen::new("ERC20", "abis/ERC20.json")?
         .generate()?
         .write_to_file("src/abis/ERC20.rs")?;
-
+    Abigen::new("ERC721", "abis/ERC721.json")?
+        .generate()?
+        .write_to_file("src/abis/ERC721.rs")?;
     Ok(())
 }

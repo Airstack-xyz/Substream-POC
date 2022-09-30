@@ -32,3 +32,11 @@ modules:
     valueType: proto:token_tracker.AirTransfer
     inputs:
       - map: map_erc20_transfer
+
+  - name: map_erc721_transfer
+    kind: map
+    initialBlock: 12369621
+    inputs:
+      - source: sf.ethereum.type.v2.Block
+    output:
+      type: proto:token_tracker.AirTransfers

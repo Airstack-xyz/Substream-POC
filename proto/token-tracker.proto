@@ -45,7 +45,9 @@ message AirTransfer{
     bytes hash = 3;
     string from = 4;
     string to = 5;
-    uint64 log_ordinal = 6;
+    string timestamp = 6;
+    uint64 blockNumber = 7;
+    uint64 log_ordinal = 8;
 }
 
 message AirAccount{

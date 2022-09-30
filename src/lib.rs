@@ -2,8 +2,6 @@ mod abis;
 mod pb;
 mod rpc;
 
-use num_bigint::BigInt;
-
 use pb::token_tracker::{AirTransfers, AirTransfer, AirBlock, AirAccount};
 use substreams::store;
 use substreams::{log, Hex, proto};
@@ -17,9 +15,6 @@ fn map_erc20_transfer(blk: eth::Block) -> Result<AirTransfers, Error> {
         if let Some(event) = abis::ERC20::events::Transfer::match_and_decode(log){
             log::info!("transfer event: {}", Hex(&event.to));
             log::info!("token: {}", Hex(log.log.clone().address));
-            // let wallet_balance_data = hex::decode("18160ddd").unwrap();
-            // log::info!()
-            // log::info!(log.to_string());
 
             let mut blockRecord: AirBlock = AirBlock{
                 hash: blk.clone().hash,
@@ -35,15 +30,22 @@ fn map_erc20_transfer(blk: eth::Block) -> Result<AirTransfers, Error> {
                 .to_string(),
             };
 
-            let sender_balance: BigInt = rpc::get_wallet_balance(&Hex(&event.from).to_string());
-            log::info!("Sender_balance: {}", sender_balance);
-
             let mut air_transfer: AirTransfer = AirTransfer{
                 amount: event.value.low_u64(),
                 token_address: Hex(log.log.clone().address).to_string(),
                 hash: log.receipt.transaction.hash.clone(),
                 from: Hex(event.from).to_string(),
                 to: Hex(event.to).to_string(),
+                block_number: blk.clone().number,
+                timestamp: blk.clone()
+                .header
+                .as_ref()
+                .unwrap()
+                .timestamp
+                .as_ref()
+                .unwrap()
+                .seconds
+                .to_string(),
                 log_ordinal: log.ordinal(),
                 ..Default::default()
             };
@@ -63,6 +65,38 @@ fn store_transfers(transfers: AirTransfers, output: store::StoreSet){
             &proto::encode(&transfer).unwrap(),
         );
     }    
+}
+
+#[substreams::handlers::map]
+fn map_erc721_transfer(blk: eth::Block) -> Result<AirTransfers, Error>{
+    let mut air_transfers = vec![];
+    for log in blk.logs(){
+        if let Some(event) = abis::ERC721::events::Transfer::match_and_decode(log){
+            log::info!("transfer event: {}", Hex(&event.to));
+            // log::info!("token: {}", Hex(log.log.clone().address));
+            let mut air_transfer: AirTransfer = AirTransfer{
+                amount: 1,
+                token_address: event.token_id.to_string(),
+                hash: log.receipt.transaction.hash.clone(),
+                from: Hex(event.from).to_string(),
+                to: Hex(event.to).to_string(),
+                block_number: blk.clone().number,
+                timestamp: blk.clone()
+                .header
+                .as_ref()
+                .unwrap()
+                .timestamp
+                .as_ref()
+                .unwrap()
+                .seconds
+                .to_string(),
+                log_ordinal: log.ordinal(),
+                ..Default::default()
+            };
+            air_transfers.push(air_transfer);
+        }
+    }
+    Ok(AirTransfers{ air_transfers})
 }
 
 fn generate_key(holder: &Vec<u8>) -> String{
