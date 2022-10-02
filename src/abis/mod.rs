@@ -1,2 +1,2 @@
-pub mod ERC20;
-pub mod ERC721;
+pub mod erc20;
+pub mod erc721;
