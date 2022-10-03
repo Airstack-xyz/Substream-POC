@@ -9,7 +9,7 @@ use substreams::errors::Error;
 use substreams_ethereum::{pb::eth::v2 as eth, Event as EventTrait};
 
 #[substreams::handlers::map]
-fn map_erc20_transfer(blk: eth::Block) -> Result<AirTransfers, Error> {
+fn map_transfers(blk: eth::Block) -> Result<AirTransfers, Error> {
     let mut air_transfers = vec![];
     for log in blk.logs(){
         if let Some(event) = abis::erc20::events::Transfer::match_and_decode(log){
@@ -22,6 +22,7 @@ fn map_erc20_transfer(blk: eth::Block) -> Result<AirTransfers, Error> {
                 hash: log.receipt.transaction.hash.clone(),
                 from: Hex(event.from).to_string(),
                 to: Hex(event.to).to_string(),
+                token_type: 1,
                 block_number: blk.clone().number,
                 timestamp: blk.clone()
                 .header
@@ -38,34 +39,15 @@ fn map_erc20_transfer(blk: eth::Block) -> Result<AirTransfers, Error> {
     
             air_transfers.push(air_transfer);
         }
-    }
-    Ok(AirTransfers{ air_transfers })
-}
-
-#[substreams::handlers::store]
-fn store_transfers(transfers: AirTransfers, output: store::StoreSet){
-    for transfer in transfers.air_transfers{
-        output.set(
-            transfer.log_ordinal,
-            generate_key(&transfer.hash),
-            &proto::encode(&transfer).unwrap(),
-        );
-    }    
-}
-
-#[substreams::handlers::map]
-fn map_erc721_transfer(blk: eth::Block) -> Result<AirTransfers, Error>{
-    let mut air_transfers = vec![];
-    for log in blk.logs(){
         if let Some(event) = abis::erc721::events::Transfer::match_and_decode(log){
             log::info!("transfer event: {}", Hex(&event.to));
-            // log::info!("token: {}", Hex(log.log.clone().address));
             let air_transfer: AirTransfer = AirTransfer{
                 amount: 1,
                 token_address: event.token_id.to_string(),
                 hash: log.receipt.transaction.hash.clone(),
                 from: Hex(event.from).to_string(),
                 to: Hex(event.to).to_string(),
+                token_type:2,
                 block_number: blk.clone().number,
                 timestamp: blk.clone()
                 .header
@@ -82,7 +64,18 @@ fn map_erc721_transfer(blk: eth::Block) -> Result<AirTransfers, Error>{
             air_transfers.push(air_transfer);
         }
     }
-    Ok(AirTransfers{ air_transfers})
+    Ok(AirTransfers{ air_transfers })
+}
+
+#[substreams::handlers::store]
+fn store_transfers(transfers: AirTransfers, output: store::StoreSet){
+    for transfer in transfers.air_transfers{
+        output.set(
+            transfer.log_ordinal,
+            generate_key(&transfer.hash),
+            &proto::encode(&transfer).unwrap(),
+        );
+    }
 }
 
 fn generate_key(holder: &Vec<u8>) -> String{

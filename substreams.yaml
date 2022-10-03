@@ -18,7 +18,7 @@ binaries:
     file: target/wasm32-unknown-unknown/release/all_token_tracker_substream.wasm
 
 modules:
-  - name: map_erc20_transfer
+  - name: map_transfers
     kind: map
     initialBlock: 12369621
     inputs:
@@ -31,12 +31,4 @@ modules:
     updatePolicy: set
     valueType: proto:token_tracker.AirTransfer
     inputs:
-      - map: map_erc20_transfer
-
-  - name: map_erc721_transfer
-    kind: map
-    initialBlock: 12369621
-    inputs:
-      - source: sf.ethereum.type.v2.Block
-    output:
-      type: proto:token_tracker.AirTransfers
+      - map: map_transfers

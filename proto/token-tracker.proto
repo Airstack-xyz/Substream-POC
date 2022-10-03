@@ -2,6 +2,13 @@ syntax = "proto3";
 
 package token_tracker;
 
+enum AirTokenStandard{
+    UNKNOWN = 0;
+    ERC20 = 1;
+    ERC721 = 2;
+    ERC1155 = 3;
+}
+
 message AirTransfers{
     repeated AirTransfer airTransfers = 1;
 }
@@ -12,7 +19,8 @@ message AirTransfer{
     bytes hash = 3;
     string from = 4;
     string to = 5;
-    string timestamp = 6;
-    uint64 blockNumber = 7;
-    uint64 log_ordinal = 8;
+    AirTokenStandard tokenType = 6;
+    string timestamp = 7;
+    uint64 blockNumber = 8;
+    uint64 log_ordinal = 9;
 }
