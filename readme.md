@@ -17,6 +17,10 @@ Once you have setup the SUBSTREAMS_API_TOKEN, you are good to run the substream.
 substreams protogen ./substreams.yaml --exclude-paths="sf/ethereum,sf/substreams,google"
 ```
 
+### Install wasm32-unknown-unknown
+```
+rustup target add wasm32-unknown-unknown
+```
 
 ### Use this command to build the project and install the rust dependencies
 ```
