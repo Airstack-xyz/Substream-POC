@@ -32,3 +32,17 @@ modules:
     valueType: proto:token_tracker.AirTransfer
     inputs:
       - map: map_transfers
+
+  - name: store_erc1155_batch
+    kind: store
+    updatePolicy: set
+    valueType: proto:token_tracker.AirERC1155TransferBatch
+    inputs:
+      - map: map_transfers
+
+  - name: store_erc1155_single
+    kind: store
+    updatePolicy: set
+    valueType: proto:token_tracker.AirERC1155TransferSingle
+    inputs:
+      - map: map_transfers

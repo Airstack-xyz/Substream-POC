@@ -10,17 +10,45 @@ enum AirTokenStandard{
 }
 
 message AirTransfers{
-    repeated AirTransfer airTransfers = 1;
+    repeated AirTransfer air_transfers = 1;
+    repeated AirERC1155TransferBatch air_transfer_batchs = 2;
+    repeated AirERC1155TransferSingle air_transfer_singles = 3;
 }
 
 message AirTransfer{
-    uint64 amount = 1;
-    string tokenAddress = 2;
-    bytes hash = 3;
+    string hash = 1;
+    uint64 log_ordinal = 2;
+    string token_id = 3;
     string from = 4;
     string to = 5;
-    AirTokenStandard tokenType = 6;
-    string timestamp = 7;
-    uint64 blockNumber = 8;
-    uint64 log_ordinal = 9;
+    string amount = 6;
+    AirTokenStandard token_type = 7;
+    uint64 block_number = 8;
+    string block_timestamp = 9;
+}
+
+message AirERC1155TransferBatch{
+    string hash = 1;
+    uint64 log_ordinal = 2;
+    repeated string token_ids = 3;
+    string operator = 4;
+    string from = 5;
+    string to = 6;
+    repeated string amounts = 7;
+    AirTokenStandard token_type = 8;
+    uint64 block_number = 9;
+    string block_timestamp = 10;
+}
+
+message AirERC1155TransferSingle{
+    string hash = 1;
+    uint64 log_ordinal = 2;
+    string token_id = 3;
+    string operator = 4;
+    string from = 5;
+    string to = 6;
+    string amount = 7;
+    AirTokenStandard token_type = 8;
+    uint64 block_number = 9;
+    string block_timestamp = 10;
 }
